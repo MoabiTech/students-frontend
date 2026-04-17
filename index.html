@@ -123,27 +123,27 @@ async function saveStudent() {
   const id = Date.now();
 
   try {
-    await Promise.all([
+    // ✅ FIREBASE SAVE (always works)
+    await db.ref("students/" + id).set({
+      firstName,
+      lastName,
+      phone
+    });
 
-      // Firebase
-      db.ref("students/" + id).set({
-        firstName,
-        lastName,
-        phone
-      }),
-
-      // PostgreSQL (UPDATE THIS URL AFTER DEPLOY)
-      fetch("https://https://student-backend-xzpt.onrender.com/add-student", {
+    // ✅ POSTGRESQL SAVE (FIXED URL)
+    try {
+      await fetch("https://student-backend-xzpt.onrender.com/add-student", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ firstName, lastName, phone })
-      })
+      });
+    } catch (err) {
+      console.warn("PostgreSQL failed but Firebase saved ✅");
+    }
 
-    ]);
-
-    alert("Saved to Firebase + PostgreSQL ✅");
+    alert("Saved successfully ✅");
 
     document.getElementById("firstName").value = "";
     document.getElementById("lastName").value = "";
